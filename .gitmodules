@@ -1,0 +1,3 @@
+[submodule "resources/pythonQtConsole"]
+	path = resources/pythonQtConsole
+	url = https://github.com/marso329/pythonQtConsole
