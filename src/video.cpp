@@ -23,10 +23,15 @@ Video::Video(std::string filename) {
 	}
 	av_dump_format(pFormatCtx, 0, filename.c_str(), 0);
 	open_=true;
+	_filename=filename;
+	_filenameWithoutPath=_filename.substr( _filename.find_last_of("\\/")+1,_filename.size()- _filename.find_last_of("\\/")-1);
 }
 
 Video::~Video() {
 
+}
+std::string Video::getFilenameWithoutPath(){
+	return _filenameWithoutPath;
 }
 
 bool Video::open() {

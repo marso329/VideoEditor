@@ -1,15 +1,11 @@
-#include "videos.h"
-#include <iostream>
+#include <QApplication>
+#include "mainwindow.h"
+int main(int argc, char *argv[]) {
 
-int main(){
+		QApplication app(argc, argv);
+	MainWindow w;
+	  w.show();
+	  return app.exec();
+ }
 
-	Videos* videoContainer=new Videos();
-	 if(videoContainer->addVideo("../test/bird.avi")){
-		 std::cout<<"success"<<std::endl;
 
-	 }
-	 else{
-		 std::cout<<"fail"<<std::endl;
-	 }
-
-}
