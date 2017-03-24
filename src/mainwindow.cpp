@@ -1,37 +1,75 @@
 #include "mainwindow.h"
 
-
-MainWindow::MainWindow(QWidget* parent):QMainWindow(parent),ui(new Ui::MainWindow){
+MainWindow::MainWindow(QWidget* parent) :
+		QMainWindow(parent), ui(new Ui::MainWindow) {
 	ui->setupUi(this);
-	_videos=new Videos(this);
-	QObject::connect( ui->listWidget,
-			&ListWidget::openFiles,this, &MainWindow::openFiles);
+	_videos = new Videos(this);
+	QObject::connect(ui->listWidget, &ListWidget::openFiles, this,
+			&MainWindow::openFiles);
 
-	QObject::connect( _videos,
-			&Videos::newVideo,ui->listWidget, &ListWidget::_addItem);
-	QObject::connect( ui->actionOpen,
-			&QAction::triggered,this, &MainWindow::openFilesMenu);
+	QObject::connect(_videos, &Videos::newVideo, ui->listWidget,
+			&ListWidget::_addItem);
+	QObject::connect(ui->actionOpen, &QAction::triggered, this,
+			&MainWindow::openFilesMenu);
+
+createProperties();
+setProperty("Width","100");
 }
-MainWindow::~MainWindow(){
+
+void MainWindow::createProperties(){
+	std::vector<std::string> v=  {"Width", "Height"};
+	//properties widget
+	ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+	ui->tableView->horizontalHeader()->setSectionResizeMode(
+			QHeaderView::Stretch);
+	QStandardItemModel *model = new QStandardItemModel(v.size(), 2, this); //2 Rows and 3 Columns
+	model->setHorizontalHeaderItem(0, new QStandardItem(QString("Properties")));
+	model->setHorizontalHeaderItem(1, new QStandardItem(QString("Value")));
+	ui->tableView->setModel(model);
+	std::size_t index=0;
+	for (auto it=v.begin();it!=v.end();it++){
+		QStandardItem * item = new QStandardItem();
+		QStandardItem * data = new QStandardItem();
+		item->setData(QVariant((*it).c_str()));
+		item->setText(tr((*it).c_str()));
+		model->setItem(index, 0, item);
+		model->setItem(index, 1, data);
+		_properties[*it]=data;
+		index++;
+	}
+}
+MainWindow::~MainWindow() {
 
 }
+void MainWindow::clearProperties(){
+	for(auto it=_properties.begin();it!=_properties.end();it++){
+		it->second->setText(tr(""));
+	}
+}
 
-void MainWindow::openFiles(QStringList files){
-	for (auto it=files.begin();it!=files.end();it++){
-		_videos->addVideo((*it).toStdString() );
+void MainWindow::setProperty(std::string key,std::string value){
+if(_properties.find(key)!=_properties.end()){
+	_properties[key]->setText(tr(value.c_str()));
+
+}
+}
+
+void MainWindow::openFiles(QStringList files) {
+	for (auto it = files.begin(); it != files.end(); it++) {
+		_videos->addVideo((*it).toStdString());
 	}
 
 }
 
-void MainWindow::openFilesMenu(){
-	std::vector<std::string> extensions=_videos->getSupportedExtensions();
+void MainWindow::openFilesMenu() {
+	std::vector<std::string> extensions = _videos->getSupportedExtensions();
 	std::ostringstream temp;
-	temp<<"Video Files (";
-	for (auto it=extensions.begin();it!=extensions.end();it++){
-		temp<<"*."<<*it<<" ";
+	temp << "Video Files (";
+	for (auto it = extensions.begin(); it != extensions.end(); it++) {
+		temp << "*." << *it << " ";
 	}
-	temp<<")";
-	QString fileName = QFileDialog::getOpenFileName(this,
-	    tr("Open Video"), "/home/martin", tr(temp.str().c_str()));
-	_videos->addVideo(fileName.toStdString() );
+	temp << ")";
+	QString fileName = QFileDialog::getOpenFileName(this, tr("Open Video"),
+			"/home/martin", tr(temp.str().c_str()));
+	_videos->addVideo(fileName.toStdString());
 }
