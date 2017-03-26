@@ -1,6 +1,10 @@
 #ifndef VIDEO_H
 #define VIDEO_H
 #include <string>
+#include <vector>
+#include <sstream>
+#include <iostream>
+#include "frame.h"
 extern "C" {
 #include "avcodec.h"
 #include "avformat.h"
@@ -12,16 +16,24 @@ extern "C" {
 class Video{
 public:
 	Video(std::string);
+	Video();
 	~Video();
+	static void do_nothing_deleter(Video*)
+	{
+	    return;
+	}
 	bool open();
 	std::string getFilenameWithoutPath();
 	void CloseVideo();
 	void CloseAudio();
 	bool CloseFile();
+	std::string getProperty(std::string);
+	static const std::vector<std::string> _properties;
 private:
+	int64_t countFrames();
 	bool open_;
 	std::string _filename;
-	std::string _filenameWithoutPath;
+public: std::string _filenameWithoutPath;
 	// FFmpeg file format.
 	  private: AVFormatContext* pFormatCtx;
 
@@ -37,6 +49,8 @@ private:
 	  // FFmpeg codec for audio.
 	  private: AVCodec* pAudioCodec;
 
+	  public: std::string codecName;
+
 	  // Video stream number in file.
 	  private: int videoStreamIndex;
 
@@ -47,7 +61,13 @@ private:
 	  private: bool isOpen;
 
 	  // Video frame per seconds.
-	  private: double videoFramePerSecond;
+	  public: double videoFramePerSecond;
+
+	  public: int64_t durationUs;
+
+	  public: int64_t durationS;
+
+	  public: int64_t nb_frames;
 
 	  // FFmpeg timebase for video.
 	  private: double videoBaseTime;
@@ -59,9 +79,10 @@ private:
 	  private: struct SwsContext *pImgConvertCtx;
 
 	  // Width of image
-	  private: int width;
+	  public: int width;
 
 	  // Height of image
-	private: int height;
+	public: int height;
 };
+
 #endif

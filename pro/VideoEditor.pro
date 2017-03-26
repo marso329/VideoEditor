@@ -22,13 +22,15 @@ SOURCES +=	$$SRCDIR/video.cpp \
 		$$SRCDIR/videos.cpp \
 		$$SRCDIR/main.cpp \
 		$$SRCDIR/mainwindow.cpp \
-		$$SRCDIR/listwidget.cpp 
+		$$SRCDIR/listwidget.cpp \
+	$$SRCDIR/frame.cpp 
 			
 
 HEADERS +=	$$INCLUDEDIR/video.h \
 		$$INCLUDEDIR/videos.h \
 	$$INCLUDEDIR/mainwindow.h \
- $$INCLUDEDIR/listwidget.h
+ $$INCLUDEDIR/listwidget.h \
+ $$INCLUDEDIR/frame.h
 
 INCLUDEPATH +=./$${INCLUDEDIR} ../resources/pythonQtConsole/include /usr/include/x86_64-linux-gnu/libavcodec/ /usr/include/x86_64-linux-gnu/libavformat/ /usr/include/ffmpeg
 

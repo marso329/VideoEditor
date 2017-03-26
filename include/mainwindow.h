@@ -10,6 +10,8 @@
 #include <sstream>
 #include <QSqlTableModel>
 #include <QStandardItemModel>
+#include <boost/python.hpp>
+
 #include <map>
 class MainWindow: public QMainWindow {
 	Q_OBJECT
@@ -24,12 +26,15 @@ private:
 	void setProperty(std::string,std::string);
 	std::map<std::string,QStandardItem *> _properties;
 protected:
-
 Q_SIGNALS:
 void addFileToListWidget(QString);
+void newCurrentVideo(QString);
 public Q_SLOTS:
 void openFiles(QStringList);
 void openFilesMenu();
+void currentVideoChangedListWidget(QListWidgetItem * current, QListWidgetItem * previous);
+void changeCurrentVideo(Video*);
+void initPython();
 
 };
 #endif

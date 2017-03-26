@@ -3,17 +3,22 @@
 Videos::Videos(QObject* parent):QObject(parent){
 	av_register_all();
 	extensions=createSupportedExtensions();
+	currentVideo=NULL;
 }
 
 Videos::~Videos(){
-
 }
+
 
 bool Videos::addVideo(std::string filename){
 	Video* video=new Video(filename);
 	if (video->open()){
 		videos.push_back(video);
 		Q_EMIT newVideo(QString::fromStdString(video->getFilenameWithoutPath()));
+		if(currentVideo==NULL){
+			currentVideo=video;
+		}
+		Q_EMIT newCurrentVideo(video);
 		return true;
 	}
 	else{
@@ -54,4 +59,36 @@ std::vector<std::string> Videos::createSupportedExtensions(){
 }
 std::vector<std::string> Videos::getSupportedExtensions(){
 	return extensions;
+}
+
+void Videos::setCurrentVideo(QString name){
+	std::cout<<"setcurrent"<<std::endl;
+	for (auto it= videos.begin();it!=videos.end();it++){
+		std::cout<<(*it)->_filenameWithoutPath<<std::endl;
+		if((*it)->_filenameWithoutPath==name.toStdString()){
+			std::cout<<"setCUrrentvideo "<<(*it)->_filenameWithoutPath<<std::endl;
+			currentVideo=*it;
+			Q_EMIT newCurrentVideo(*it);
+		}
+	}
+}
+
+void Videos::addVideoPython(std::string filename){
+	Video* video=new Video(filename);
+	if (video->open()){
+		videos.push_back(video);
+		Q_EMIT newVideo(QString::fromStdString(video->getFilenameWithoutPath()));
+		if(currentVideo==NULL){
+			currentVideo=video;
+		}
+		Q_EMIT newCurrentVideo(video);
+
+	}
+	else{
+		delete video;
+	}
+}
+
+boost::shared_ptr<Video>  Videos::getCurrentVideoPython(){
+	return boost::shared_ptr<Video> (currentVideo,Video::do_nothing_deleter);
 }

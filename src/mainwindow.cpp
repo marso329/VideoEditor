@@ -11,23 +11,34 @@ MainWindow::MainWindow(QWidget* parent) :
 			&ListWidget::_addItem);
 	QObject::connect(ui->actionOpen, &QAction::triggered, this,
 			&MainWindow::openFilesMenu);
+	QObject::connect(ui->listWidget, &ListWidget::currentItemChanged, this,
+			&MainWindow::currentVideoChangedListWidget);
+	QObject::connect(_videos, &Videos::newCurrentVideo, this,
+			&MainWindow::changeCurrentVideo);
+	QObject::connect(this, &MainWindow::newCurrentVideo, _videos,
+			&Videos::setCurrentVideo);
 
 createProperties();
-setProperty("Width","100");
+initPython();
+}
+
+void MainWindow::currentVideoChangedListWidget(QListWidgetItem * current, QListWidgetItem * previous){
+QString shortFilename=current->text();
+Q_EMIT newCurrentVideo(shortFilename);
+std::cout<<"curretnVideochangedListwidget: "<<shortFilename.toStdString()<<std::endl;
 }
 
 void MainWindow::createProperties(){
-	std::vector<std::string> v=  {"Width", "Height"};
 	//properties widget
 	ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	ui->tableView->horizontalHeader()->setSectionResizeMode(
 			QHeaderView::Stretch);
-	QStandardItemModel *model = new QStandardItemModel(v.size(), 2, this); //2 Rows and 3 Columns
+	QStandardItemModel *model = new QStandardItemModel(Video::_properties.size(), 2, this); //2 Rows and 3 Columns
 	model->setHorizontalHeaderItem(0, new QStandardItem(QString("Properties")));
 	model->setHorizontalHeaderItem(1, new QStandardItem(QString("Value")));
 	ui->tableView->setModel(model);
 	std::size_t index=0;
-	for (auto it=v.begin();it!=v.end();it++){
+	for (auto it=Video::_properties.begin();it!=Video::_properties.end();it++){
 		QStandardItem * item = new QStandardItem();
 		QStandardItem * data = new QStandardItem();
 		item->setData(QVariant((*it).c_str()));
@@ -72,4 +83,39 @@ void MainWindow::openFilesMenu() {
 	QString fileName = QFileDialog::getOpenFileName(this, tr("Open Video"),
 			"/home/martin", tr(temp.str().c_str()));
 	_videos->addVideo(fileName.toStdString());
+}
+
+void MainWindow::changeCurrentVideo(Video* newCurrentVideo){
+	std::cout<<"changeCurerntVideo: "<<newCurrentVideo->_filenameWithoutPath<<std::endl;
+	clearProperties();
+	for (auto it = Video::_properties.begin();it!=Video::_properties.end();it++){
+		setProperty(*it,newCurrentVideo->getProperty(*it));
+	}
+}
+
+void MainWindow::initPython(){
+	boost::python::dict main_namespace=ui->widget->getMainNamespace();
+
+	try {
+		main_namespace["Video"] = class_<Video,boost::noncopyable>(
+				"Video", boost::python::no_init).def_readonly("FPS", &Video::videoFramePerSecond)
+				.def_readonly("Width", &Video::width).
+				def_readonly("Height", &Video::height).
+				def_readonly("Duration_sec", &Video::durationS).
+				def_readonly("Duration_usec", &Video::durationUs);
+		boost::python::register_ptr_to_python<boost::shared_ptr<Video>>();
+	} catch (error_already_set ) {
+		PyErr_Print();
+	}
+	//expose videos
+	try {
+		main_namespace["Videos"] = class_<Videos,boost::noncopyable>(
+				"Videos", boost::python::no_init).def("open",
+				&Videos::addVideoPython).def("getCurrent",&Videos::getCurrentVideoPython);
+		boost::python::register_ptr_to_python<boost::shared_ptr<Videos>>();
+		main_namespace["videos"] = ptr(_videos);
+	} catch (error_already_set ) {
+		PyErr_Print();
+	}
+
 }
