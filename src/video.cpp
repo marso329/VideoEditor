@@ -1,12 +1,12 @@
 #include "video.h"
-Video::Video():pImgConvertCtx(NULL), audioBaseTime(0.0), videoBaseTime(0.0),
+Video::Video(QObject* parent):QObject(parent), pImgConvertCtx(NULL), audioBaseTime(0.0), videoBaseTime(0.0),
 videoFramePerSecond(0.0), isOpen(false), audioStreamIndex(-1), videoStreamIndex(-1),
 pAudioCodec(NULL), pAudioCodecCtx(NULL), pVideoCodec(NULL), pVideoCodecCtx(NULL),durationUs(0),durationS(0),
 pFormatCtx(NULL),width(0),height(0),open_(false),codecName(""),nb_frames(0){
 
 }
 
-Video::Video(std::string filename) : pImgConvertCtx(NULL), audioBaseTime(0.0), videoBaseTime(0.0),
+Video::Video(std::string filename,QObject* parent) :QObject(parent), pImgConvertCtx(NULL), audioBaseTime(0.0), videoBaseTime(0.0),
 videoFramePerSecond(0.0), isOpen(false), audioStreamIndex(-1), videoStreamIndex(-1),
 pAudioCodec(NULL), pAudioCodecCtx(NULL), pVideoCodec(NULL), pVideoCodecCtx(NULL),durationUs(0),durationS(0),
 pFormatCtx(NULL) {
@@ -64,7 +64,7 @@ pFormatCtx(NULL) {
 			pImgConvertCtx = sws_getContext(pVideoCodecCtx->width, pVideoCodecCtx->height,
 				pVideoCodecCtx->pix_fmt,
 				pVideoCodecCtx->width, pVideoCodecCtx->height,
-				AV_PIX_FMT_BGR24,
+				AV_PIX_FMT_RGB555,
 				SWS_BICUBIC, NULL, NULL, NULL);
 		}
 		if(videoStreamIndex != -1)
@@ -86,6 +86,7 @@ pFormatCtx(NULL) {
 			}
 	_filename=filename;
 	_filenameWithoutPath=_filename.substr( _filename.find_last_of("\\/")+1,_filename.size()- _filename.find_last_of("\\/")-1);
+	insertFrames();
 }
 
 Video::~Video() {
@@ -163,6 +164,70 @@ int64_t Video::countFrames(){
 	else{
 		return counter;
 	}
+}
+
+void Video::insertFrames(){
+	AVFrame * res = NULL;
+
+		if (videoStreamIndex != -1)
+		{
+			AVFrame *pVideoYuv = av_frame_alloc();
+			AVPacket packet;
+
+			if (open_)
+			{
+				// Read packet.
+				while (av_read_frame(pFormatCtx, &packet) >= 0)
+				{
+					int64_t pts = 0;
+					pts = (packet.dts != AV_NOPTS_VALUE) ? packet.dts : 0;
+
+					if(packet.stream_index == videoStreamIndex)
+					{
+						// Convert ffmpeg frame timestamp to real frame number.
+						int64_t numberFrame = (double)((int64_t)pts -
+							pFormatCtx->streams[videoStreamIndex]->start_time) *
+							videoBaseTime * videoFramePerSecond;
+
+						// Decode frame
+						bool isDecodeComplite = DecodeVideo(&packet, pVideoYuv);
+						if (isDecodeComplite)
+						{
+							std::cout<<"inserted frame"<<std::endl;
+							Frame* frame=new Frame(this);
+							frame->insertData(pVideoYuv,pImgConvertCtx,width,height);
+							frames.push_back(frame);
+
+						}
+
+					}
+					av_free_packet(&packet);
+					packet = AVPacket();
+				}
+
+				av_free(pVideoYuv);
+			}
+		}
+}
+
+
+bool Video::DecodeVideo(const AVPacket *avpkt, AVFrame * pOutFrame)
+{
+	bool res = false;
+
+	if (pVideoCodecCtx)
+	{
+		if (avpkt && pOutFrame)
+		{
+			int got_picture_ptr = 0;
+			int videoFrameBytes = avcodec_decode_video2(pVideoCodecCtx, pOutFrame, &got_picture_ptr, avpkt);
+
+//			avcodec_decode_video(pVideoCodecCtx, pOutFrame, &videoFrameBytes, pInBuffer, nInbufferSize);
+			res = (videoFrameBytes > 0);
+		}
+	}
+
+	return res;
 }
 std::string Video::getProperty(std::string prop){
 std::ostringstream temp;

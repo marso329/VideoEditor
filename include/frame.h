@@ -12,6 +12,8 @@
 #include <smmintrin.h>
 #include <pmmintrin.h>
 #include <immintrin.h>
+#include <QImage>
+#include <QGraphicsPixmapItem>
 extern "C" {
 #include "avcodec.h"
 #include "avformat.h"
@@ -31,6 +33,8 @@ public:
 	  // Height of image
 	int height;
 	uint8_t * buffer ;
+	QImage *img ;
+	QGraphicsPixmapItem* item;
 };
 
 

@@ -5,6 +5,7 @@
 #include <sstream>
 #include <iostream>
 #include "frame.h"
+#include <QObject>
 extern "C" {
 #include "avcodec.h"
 #include "avformat.h"
@@ -13,10 +14,11 @@ extern "C" {
 }
 
 
-class Video{
+class Video: public QObject{
+	Q_OBJECT
 public:
-	Video(std::string);
-	Video();
+	Video(std::string,QObject* parent);
+	Video(QObject* parent);
 	~Video();
 	static void do_nothing_deleter(Video*)
 	{
@@ -29,8 +31,11 @@ public:
 	bool CloseFile();
 	std::string getProperty(std::string);
 	static const std::vector<std::string> _properties;
+	std::vector<Frame*> frames;
 private:
 	int64_t countFrames();
+	bool DecodeVideo(const AVPacket *avpkt, AVFrame * pOutFrame);
+	void insertFrames();
 	bool open_;
 	std::string _filename;
 public: std::string _filenameWithoutPath;

@@ -17,11 +17,31 @@ MainWindow::MainWindow(QWidget* parent) :
 			&MainWindow::changeCurrentVideo);
 	QObject::connect(this, &MainWindow::newCurrentVideo, _videos,
 			&Videos::setCurrentVideo);
+	 scene = new QGraphicsScene();
+	ui->graphicsView->setScene(scene);
+	ui->graphicsView->show();
+	ui->horizontalSlider->setMinimum(0);
+	ui->horizontalSlider->setMaximum(5400);
+	QObject::connect(ui->horizontalSlider, &QSlider::valueChanged,this,
+			&MainWindow::sliderChanged);
+	QObject::connect(this, &MainWindow::newCurrentFrame,_videos,
+			&Videos::newCurrentFrame);
+	QObject::connect(_videos, &Videos::changeCurrentFrame,this,
+				&MainWindow::changeCurrentFrame);
 
 createProperties();
 initPython();
 }
 
+void MainWindow::changeCurrentFrame(Frame* frame){
+	scene->removeItem(frame->item);
+	    scene->addItem(frame->item);
+ui->graphicsView->show();
+}
+void MainWindow::sliderChanged(int value){
+	float pos=(float)value/(float)ui->horizontalSlider->maximum();
+	Q_EMIT newCurrentFrame(pos);
+}
 void MainWindow::currentVideoChangedListWidget(QListWidgetItem * current, QListWidgetItem * previous){
 QString shortFilename=current->text();
 Q_EMIT newCurrentVideo(shortFilename);
@@ -91,6 +111,10 @@ void MainWindow::changeCurrentVideo(Video* newCurrentVideo){
 	for (auto it = Video::_properties.begin();it!=Video::_properties.end();it++){
 		setProperty(*it,newCurrentVideo->getProperty(*it));
 	}
+	Frame* frame= newCurrentVideo->frames.front();
+	scene->removeItem(frame->item);
+	    scene->addItem(frame->item);
+ui->graphicsView->show();
 }
 
 void MainWindow::initPython(){

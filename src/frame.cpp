@@ -19,18 +19,20 @@ bool Frame::insertData(AVFrame* package,struct SwsContext *pImgConvertCtx,int wi
 	width=width_;
 	height=height_;
 	AVFrame * frame = NULL;
-		int bufferImgSize = avpicture_get_size(AV_PIX_FMT_BGR24, width, height);
+		int bufferImgSize = avpicture_get_size(AV_PIX_FMT_RGB555, width, height);
 		frame = av_frame_alloc();
-		uint8_t * buffer = (uint8_t*)av_mallocz(bufferImgSize);
+		 buffer = (uint8_t*)av_mallocz(bufferImgSize);
 		if (frame)
 		{
-			avpicture_fill((AVPicture*)frame, buffer, AV_PIX_FMT_BGR24, width, height);
+			avpicture_fill((AVPicture*)frame, buffer, AV_PIX_FMT_RGB555, width, height);
 			frame->width  = width;
 			frame->height = height;
 			//frame->data[0] = buffer;
 
 			sws_scale(pImgConvertCtx, package->data, package->linesize,
 				0, height, frame->data, frame->linesize);
+			img = new QImage(buffer, frame->width, frame->height, QImage::Format_RGB555);
+			item =new QGraphicsPixmapItem( QPixmap::fromImage(*img));
 		return true;
 		}
 		else{

@@ -10,7 +10,10 @@
 #include <sstream>
 #include <QSqlTableModel>
 #include <QStandardItemModel>
+#include <QGraphicsPixmapItem>
 #include <boost/python.hpp>
+#include <qimage.h>
+#include <QImage>
 
 #include <map>
 class MainWindow: public QMainWindow {
@@ -25,16 +28,19 @@ private:
 	void clearProperties();
 	void setProperty(std::string,std::string);
 	std::map<std::string,QStandardItem *> _properties;
+	QGraphicsScene* scene;
 protected:
 Q_SIGNALS:
 void addFileToListWidget(QString);
 void newCurrentVideo(QString);
+void newCurrentFrame(float);
 public Q_SLOTS:
 void openFiles(QStringList);
 void openFilesMenu();
 void currentVideoChangedListWidget(QListWidgetItem * current, QListWidgetItem * previous);
 void changeCurrentVideo(Video*);
+void changeCurrentFrame(Frame*);
 void initPython();
-
+void sliderChanged(int);
 };
 #endif

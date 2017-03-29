@@ -11,7 +11,7 @@ Videos::~Videos(){
 
 
 bool Videos::addVideo(std::string filename){
-	Video* video=new Video(filename);
+	Video* video=new Video(filename,this);
 	if (video->open()){
 		videos.push_back(video);
 		Q_EMIT newVideo(QString::fromStdString(video->getFilenameWithoutPath()));
@@ -74,7 +74,7 @@ void Videos::setCurrentVideo(QString name){
 }
 
 void Videos::addVideoPython(std::string filename){
-	Video* video=new Video(filename);
+	Video* video=new Video(filename,this);
 	if (video->open()){
 		videos.push_back(video);
 		Q_EMIT newVideo(QString::fromStdString(video->getFilenameWithoutPath()));
@@ -91,4 +91,12 @@ void Videos::addVideoPython(std::string filename){
 
 boost::shared_ptr<Video>  Videos::getCurrentVideoPython(){
 	return boost::shared_ptr<Video> (currentVideo,Video::do_nothing_deleter);
+}
+void Videos::newCurrentFrame(float value){
+	int framenumber =floor(value*(float)currentVideo->frames.size());
+	if (framenumber>currentVideo->frames.size()-1){
+		framenumber=currentVideo->frames.size()-1;
+	}
+	Frame* frame=currentVideo->frames.at(framenumber);
+	Q_EMIT changeCurrentFrame(frame);
 }

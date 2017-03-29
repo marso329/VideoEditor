@@ -8,6 +8,7 @@
 #include <sstream>
 #include <algorithm>
 #include <boost/shared_ptr.hpp>
+#include <cmath>
 extern "C" {
 #include "avcodec.h"
 #include "avformat.h"
@@ -31,7 +32,10 @@ private:
 protected:
 	Q_SIGNALS:
 	void newVideo(QString);
-	void newCurrentVideo(Video*);public Q_SLOTS:
+	void newCurrentVideo(Video*);
+	void changeCurrentFrame(Frame*);
+	public Q_SLOTS:
 	void setCurrentVideo(QString);
+	void newCurrentFrame(float);
 
 };
