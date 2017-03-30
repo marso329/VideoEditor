@@ -1,15 +1,15 @@
 #include "video.h"
-Video::Video(QObject* parent):QObject(parent), pImgConvertCtx(NULL), audioBaseTime(0.0), videoBaseTime(0.0),
-videoFramePerSecond(0.0), isOpen(false), audioStreamIndex(-1), videoStreamIndex(-1),
-pAudioCodec(NULL), pAudioCodecCtx(NULL), pVideoCodec(NULL), pVideoCodecCtx(NULL),durationUs(0),durationS(0),
-pFormatCtx(NULL),width(0),height(0),open_(false),codecName(""),nb_frames(0){
+Video::Video(QObject* parent):QObject(parent),open_(false),pFormatCtx(NULL),pVideoCodecCtx(NULL),
+pVideoCodec(NULL),pAudioCodecCtx(NULL),pAudioCodec(NULL),codecName(""),videoStreamIndex(-1),audioStreamIndex(-1),
+videoFramePerSecond(0),durationUs(0),durationS(0),nb_frames(0),videoBaseTime(0.0),audioBaseTime(0.0),pImgConvertCtx(NULL),
+width(0),height(0){
 
 }
 
-Video::Video(std::string filename,QObject* parent) :QObject(parent), pImgConvertCtx(NULL), audioBaseTime(0.0), videoBaseTime(0.0),
-videoFramePerSecond(0.0), isOpen(false), audioStreamIndex(-1), videoStreamIndex(-1),
-pAudioCodec(NULL), pAudioCodecCtx(NULL), pVideoCodec(NULL), pVideoCodecCtx(NULL),durationUs(0),durationS(0),
-pFormatCtx(NULL) {
+Video::Video(std::string filename,QObject* parent) :QObject(parent),open_(false),pFormatCtx(NULL),pVideoCodecCtx(NULL),
+		pVideoCodec(NULL),pAudioCodecCtx(NULL),pAudioCodec(NULL),codecName(""),videoStreamIndex(-1),audioStreamIndex(-1),
+		videoFramePerSecond(0),durationUs(0),durationS(0),nb_frames(0),videoBaseTime(0.0),audioBaseTime(0.0),pImgConvertCtx(NULL),
+		width(0),height(0){
 	open_=false;
 	// Open file
 	if (avformat_open_input(&pFormatCtx, filename.c_str(), NULL, NULL) != 0) {
@@ -123,7 +123,6 @@ void Video::CloseAudio()
 }
 bool Video::CloseFile()
 {
-	isOpen = false;
 
 	// Close video and audio.
 	CloseVideo();
@@ -147,8 +146,8 @@ int64_t Video::countFrames(){
 		std::cout<<"frame counter"<<std::endl;
 		while (av_read_frame(pFormatCtx, &packet) >= 0)
 		{
-			int64_t pts = 0;
-			pts = (packet.dts != AV_NOPTS_VALUE) ? packet.dts : 0;
+		//	int64_t pts = 0;
+		//	pts = (packet.dts != AV_NOPTS_VALUE) ? packet.dts : 0;
 			if(packet.stream_index == videoStreamIndex)
 			{
 				counter++;
@@ -167,7 +166,7 @@ int64_t Video::countFrames(){
 }
 
 void Video::insertFrames(){
-	AVFrame * res = NULL;
+//	AVFrame * res = NULL;
 
 		if (videoStreamIndex != -1)
 		{
@@ -179,15 +178,15 @@ void Video::insertFrames(){
 				// Read packet.
 				while (av_read_frame(pFormatCtx, &packet) >= 0)
 				{
-					int64_t pts = 0;
-					pts = (packet.dts != AV_NOPTS_VALUE) ? packet.dts : 0;
+		//			int64_t pts = 0;
+			//		pts = (packet.dts != AV_NOPTS_VALUE) ? packet.dts : 0;
 
 					if(packet.stream_index == videoStreamIndex)
 					{
 						// Convert ffmpeg frame timestamp to real frame number.
-						int64_t numberFrame = (double)((int64_t)pts -
-							pFormatCtx->streams[videoStreamIndex]->start_time) *
-							videoBaseTime * videoFramePerSecond;
+					//	int64_t numberFrame = (double)((int64_t)pts -
+					//		pFormatCtx->streams[videoStreamIndex]->start_time) *
+					//		videoBaseTime * videoFramePerSecond;
 
 						// Decode frame
 						bool isDecodeComplite = DecodeVideo(&packet, pVideoYuv);

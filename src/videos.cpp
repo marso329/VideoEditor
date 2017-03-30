@@ -93,7 +93,7 @@ boost::shared_ptr<Video>  Videos::getCurrentVideoPython(){
 	return boost::shared_ptr<Video> (currentVideo,Video::do_nothing_deleter);
 }
 void Videos::newCurrentFrame(float value){
-	int framenumber =floor(value*(float)currentVideo->frames.size());
+	std::size_t framenumber =floor(value*(float)currentVideo->frames.size());
 	if (framenumber>currentVideo->frames.size()-1){
 		framenumber=currentVideo->frames.size()-1;
 	}

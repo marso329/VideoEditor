@@ -7,7 +7,8 @@ MainWindow::MainWindow(QWidget* parent) :
 	QObject::connect(ui->listWidget, &ListWidget::openFiles, this,
 			&MainWindow::openFiles);
 
-	QObject::connect(_videos, &Videos::newVideo, ui->listWidget,
+	QObject::connect(_videos, &Videos::newVideo,this,&MainWindow::newVideo);
+	QObject::connect(this,&MainWindow::newVideoListwidget, ui->listWidget,
 			&ListWidget::_addItem);
 	QObject::connect(ui->actionOpen, &QAction::triggered, this,
 			&MainWindow::openFilesMenu);
@@ -20,6 +21,9 @@ MainWindow::MainWindow(QWidget* parent) :
 	 scene = new QGraphicsScene();
 	ui->graphicsView->setScene(scene);
 	ui->graphicsView->show();
+	ui->graphicsView->setHorizontalScrollBarPolicy ( Qt::ScrollBarAlwaysOff );
+	ui->graphicsView->setVerticalScrollBarPolicy ( Qt::ScrollBarAlwaysOff );
+	ui->graphicsView->fitInView( scene->sceneRect(), Qt::KeepAspectRatio );
 	ui->horizontalSlider->setMinimum(0);
 	ui->horizontalSlider->setMaximum(5400);
 	QObject::connect(ui->horizontalSlider, &QSlider::valueChanged,this,
@@ -42,7 +46,7 @@ void MainWindow::sliderChanged(int value){
 	float pos=(float)value/(float)ui->horizontalSlider->maximum();
 	Q_EMIT newCurrentFrame(pos);
 }
-void MainWindow::currentVideoChangedListWidget(QListWidgetItem * current, QListWidgetItem * previous){
+void MainWindow::currentVideoChangedListWidget(QListWidgetItem * current, QListWidgetItem * previous __attribute__ ((unused))){
 QString shortFilename=current->text();
 Q_EMIT newCurrentVideo(shortFilename);
 std::cout<<"curretnVideochangedListwidget: "<<shortFilename.toStdString()<<std::endl;
@@ -142,4 +146,7 @@ void MainWindow::initPython(){
 		PyErr_Print();
 	}
 
+}
+void MainWindow::newVideo(QString value){
+Q_EMIT newVideoListwidget(value);
 }

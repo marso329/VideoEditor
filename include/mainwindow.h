@@ -34,6 +34,7 @@ Q_SIGNALS:
 void addFileToListWidget(QString);
 void newCurrentVideo(QString);
 void newCurrentFrame(float);
+void newVideoListwidget(QString);
 public Q_SLOTS:
 void openFiles(QStringList);
 void openFilesMenu();
@@ -42,5 +43,6 @@ void changeCurrentVideo(Video*);
 void changeCurrentFrame(Frame*);
 void initPython();
 void sliderChanged(int);
+void newVideo(QString);
 };
 #endif

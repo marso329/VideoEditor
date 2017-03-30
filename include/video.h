@@ -37,8 +37,6 @@ private:
 	bool DecodeVideo(const AVPacket *avpkt, AVFrame * pOutFrame);
 	void insertFrames();
 	bool open_;
-	std::string _filename;
-public: std::string _filenameWithoutPath;
 	// FFmpeg file format.
 	  private: AVFormatContext* pFormatCtx;
 
@@ -61,9 +59,6 @@ public: std::string _filenameWithoutPath;
 
 	  // Audio stream number in file.
 	  private: int audioStreamIndex;
-
-	  // File is open or not.
-	  private: bool isOpen;
 
 	  // Video frame per seconds.
 	  public: double videoFramePerSecond;
@@ -88,6 +83,8 @@ public: std::string _filenameWithoutPath;
 
 	  // Height of image
 	public: int height;
+	std::string _filename;
+public: std::string _filenameWithoutPath;
 };
 
 #endif
