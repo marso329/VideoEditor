@@ -28,11 +28,12 @@ public:
 	~Frame();
 	  // Width of image
 	  public:
-	int width;
+	size_t width;
 
 	  // Height of image
-	int height;
+	size_t height;
 	uint8_t * buffer ;
+	std::vector<uint8_t> getRGB(size_t,size_t);
 	QImage *img ;
 	QGraphicsPixmapItem* item;
 };

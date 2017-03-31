@@ -15,6 +15,30 @@ Frame::~Frame(){
 
 }
 
+std::vector<uint8_t> Frame::getRGB(size_t x,size_t y){
+	std::vector<uint8_t> data;
+	if(x>=width){
+		return data;
+	}
+	if(y>=height){
+		return data;
+	}
+	uint8_t* buffer_pos=buffer+ (width*y+x)*2;
+	uint16_t red;
+	uint16_t green;
+	uint16_t blue;
+	uint16_t temp_data;
+	memcpy(&temp_data,buffer_pos,2);
+	red=temp_data&0x1f;
+	green=(temp_data&0x3e0)>>5;
+	blue=(temp_data&0x7c00)>>10;
+	data.push_back((uint8_t)red);
+	data.push_back((uint8_t)green);
+	data.push_back((uint8_t)blue);
+return data;
+
+}
+
 bool Frame::insertData(AVFrame* package,struct SwsContext *pImgConvertCtx,int width_,int height_){
 	width=width_;
 	height=height_;
