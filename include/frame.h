@@ -14,6 +14,9 @@
 #include <immintrin.h>
 #include <QImage>
 #include <QGraphicsPixmapItem>
+#include <boost/shared_ptr.hpp>
+#include <boost/python.hpp>
+#include <iostream>
 extern "C" {
 #include "avcodec.h"
 #include "avformat.h"
@@ -25,6 +28,10 @@ class Frame: public QObject {
 public:
 	Frame(QObject* parent);
 	bool insertData(AVFrame*,struct SwsContext *,int,int);
+	static void do_nothing_deleter(Frame*)
+	{
+	    return;
+	}
 	~Frame();
 	  // Width of image
 	  public:
@@ -33,7 +40,8 @@ public:
 	  // Height of image
 	size_t height;
 	uint8_t * buffer ;
-	std::vector<uint8_t> getRGB(size_t,size_t);
+	boost::python::list getRGB(size_t,size_t);
+	void setRGB(size_t,size_t,uint8_t,uint8_t,uint8_t);
 	QImage *img ;
 	QGraphicsPixmapItem* item;
 };

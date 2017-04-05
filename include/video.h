@@ -32,6 +32,10 @@ public:
 	std::string getProperty(std::string);
 	static const std::vector<std::string> _properties;
 	std::vector<Frame*> frames;
+	void setCurrentFrame(float);
+	Frame* currentFrame;
+	Frame* getCurrentFrame();
+	boost::shared_ptr<Frame> getCurrentFramePython();
 private:
 	int64_t countFrames();
 	bool DecodeVideo(const AVPacket *avpkt, AVFrame * pOutFrame);

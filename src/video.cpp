@@ -1,12 +1,12 @@
 #include "video.h"
-Video::Video(QObject* parent):QObject(parent),open_(false),pFormatCtx(NULL),pVideoCodecCtx(NULL),
+Video::Video(QObject* parent):QObject(parent),currentFrame(NULL),open_(false),pFormatCtx(NULL),pVideoCodecCtx(NULL),
 pVideoCodec(NULL),pAudioCodecCtx(NULL),pAudioCodec(NULL),codecName(""),videoStreamIndex(-1),audioStreamIndex(-1),
 videoFramePerSecond(0),durationUs(0),durationS(0),nb_frames(0),videoBaseTime(0.0),audioBaseTime(0.0),pImgConvertCtx(NULL),
 width(0),height(0){
 
 }
 
-Video::Video(std::string filename,QObject* parent) :QObject(parent),open_(false),pFormatCtx(NULL),pVideoCodecCtx(NULL),
+Video::Video(std::string filename,QObject* parent) :QObject(parent),currentFrame(NULL),open_(false),pFormatCtx(NULL),pVideoCodecCtx(NULL),
 		pVideoCodec(NULL),pAudioCodecCtx(NULL),pAudioCodec(NULL),codecName(""),videoStreamIndex(-1),audioStreamIndex(-1),
 		videoFramePerSecond(0),durationUs(0),durationS(0),nb_frames(0),videoBaseTime(0.0),audioBaseTime(0.0),pImgConvertCtx(NULL),
 		width(0),height(0){
@@ -167,7 +167,7 @@ int64_t Video::countFrames(){
 
 void Video::insertFrames(){
 //	AVFrame * res = NULL;
-
+     bool first=true;
 		if (videoStreamIndex != -1)
 		{
 			AVFrame *pVideoYuv = av_frame_alloc();
@@ -196,6 +196,10 @@ void Video::insertFrames(){
 							Frame* frame=new Frame(this);
 							frame->insertData(pVideoYuv,pImgConvertCtx,width,height);
 							frames.push_back(frame);
+							if (first){
+								currentFrame=frame;
+								first=false;
+							}
 
 						}
 
@@ -228,6 +232,22 @@ bool Video::DecodeVideo(const AVPacket *avpkt, AVFrame * pOutFrame)
 
 	return res;
 }
+
+Frame* Video::getCurrentFrame(){
+	return currentFrame;
+}
+boost::shared_ptr<Frame> Video::getCurrentFramePython(){
+	return boost::shared_ptr<Frame> (currentFrame,Frame::do_nothing_deleter);
+}
+void Video::setCurrentFrame(float value){
+	std::size_t frame_number=floor(value*(float)frames.size());
+	if (frame_number>frames.size()-1){
+		frame_number=frames.size()-1;
+	}
+	currentFrame=frames.at(frame_number);
+
+}
+
 std::string Video::getProperty(std::string prop){
 std::ostringstream temp;
 

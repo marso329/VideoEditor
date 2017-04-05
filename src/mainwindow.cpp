@@ -49,7 +49,6 @@ void MainWindow::sliderChanged(int value){
 void MainWindow::currentVideoChangedListWidget(QListWidgetItem * current, QListWidgetItem * previous __attribute__ ((unused))){
 QString shortFilename=current->text();
 Q_EMIT newCurrentVideo(shortFilename);
-std::cout<<"curretnVideochangedListwidget: "<<shortFilename.toStdString()<<std::endl;
 }
 
 void MainWindow::createProperties(){
@@ -123,14 +122,21 @@ ui->graphicsView->show();
 
 void MainWindow::initPython(){
 	boost::python::dict main_namespace=ui->widget->getMainNamespace();
-
+	try {
+		main_namespace["Frame"] = class_<Frame,boost::noncopyable>(
+				"Frame", boost::python::no_init).def("getRGB",
+				&Frame::getRGB).def("setRGB",&Frame::setRGB);
+		boost::python::register_ptr_to_python<boost::shared_ptr<Frame>>();
+	} catch (error_already_set ) {
+		PyErr_Print();
+	}
 	try {
 		main_namespace["Video"] = class_<Video,boost::noncopyable>(
 				"Video", boost::python::no_init).def_readonly("FPS", &Video::videoFramePerSecond)
 				.def_readonly("Width", &Video::width).
 				def_readonly("Height", &Video::height).
 				def_readonly("Duration_sec", &Video::durationS).
-				def_readonly("Duration_usec", &Video::durationUs);
+				def_readonly("Duration_usec", &Video::durationUs).def("getCurrentFrame",&Video::getCurrentFramePython);
 		boost::python::register_ptr_to_python<boost::shared_ptr<Video>>();
 	} catch (error_already_set ) {
 		PyErr_Print();

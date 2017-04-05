@@ -15,8 +15,26 @@ Frame::~Frame(){
 
 }
 
-std::vector<uint8_t> Frame::getRGB(size_t x,size_t y){
-	std::vector<uint8_t> data;
+void Frame::setRGB(size_t x,size_t y,uint8_t r,uint8_t g,uint8_t b){
+	if(x>=width){
+		return;
+	}
+	if(y>=height){
+		return;
+	}
+	if(r<31||g<31||b<31){
+		return;
+	}
+	uint8_t* buffer_pos=buffer+ (width*y+x)*2;
+	uint16_t temp_data=0;
+	temp_data+=r&0x1f;
+	temp_data+=((g&0x3e0)>>5);
+	temp_data+=((b&0x7c00)>>10);
+	memcpy(buffer_pos,&temp_data,2);
+}
+
+boost::python::list Frame::getRGB(size_t x,size_t y){
+	boost::python::list data;
 	if(x>=width){
 		return data;
 	}
@@ -32,9 +50,9 @@ std::vector<uint8_t> Frame::getRGB(size_t x,size_t y){
 	red=temp_data&0x1f;
 	green=(temp_data&0x3e0)>>5;
 	blue=(temp_data&0x7c00)>>10;
-	data.push_back((uint8_t)red);
-	data.push_back((uint8_t)green);
-	data.push_back((uint8_t)blue);
+	data.append((uint8_t)red);
+	data.append((uint8_t)green);
+	data.append((uint8_t)blue);
 return data;
 
 }
