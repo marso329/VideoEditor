@@ -36,6 +36,9 @@ public:
 	Frame* currentFrame;
 	Frame* getCurrentFrame();
 	boost::shared_ptr<Frame> getCurrentFramePython();
+	float getPosition(){
+		return position;
+	}
 private:
 	int64_t countFrames();
 	bool DecodeVideo(const AVPacket *avpkt, AVFrame * pOutFrame);
@@ -79,6 +82,7 @@ private:
 	  // FFmpeg timebase for audio.
 	  private: double audioBaseTime;
 
+
 	  // FFmpeg context convert image.
 	  private: struct SwsContext *pImgConvertCtx;
 
@@ -87,6 +91,8 @@ private:
 
 	  // Height of image
 	public: int height;
+
+	  private: float position;
 	std::string _filename;
 public: std::string _filenameWithoutPath;
 };

@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget* parent) :
 	ui->graphicsView->show();
 	ui->graphicsView->setHorizontalScrollBarPolicy ( Qt::ScrollBarAlwaysOff );
 	ui->graphicsView->setVerticalScrollBarPolicy ( Qt::ScrollBarAlwaysOff );
-	ui->graphicsView->fitInView( scene->sceneRect(), Qt::KeepAspectRatio );
+	ui->graphicsView->fitInView(scene->itemsBoundingRect(), Qt::KeepAspectRatio );
 	ui->horizontalSlider->setMinimum(0);
 	ui->horizontalSlider->setMaximum(5400);
 	QObject::connect(ui->horizontalSlider, &QSlider::valueChanged,this,
@@ -38,8 +38,13 @@ initPython();
 }
 
 void MainWindow::changeCurrentFrame(Frame* frame){
-	scene->removeItem(frame->item);
-	    scene->addItem(frame->item);
+	QList<QGraphicsItem *> items =scene->items();
+	for (auto it = items.begin();it!=items.end();it++){
+		scene->removeItem(*it);
+	}
+	    scene->addItem(frame->getPixmap());
+	    scene->update();
+	    ui->graphicsView->fitInView(scene->itemsBoundingRect() ,Qt::KeepAspectRatio);
 ui->graphicsView->show();
 }
 void MainWindow::sliderChanged(int value){
@@ -114,10 +119,11 @@ void MainWindow::changeCurrentVideo(Video* newCurrentVideo){
 	for (auto it = Video::_properties.begin();it!=Video::_properties.end();it++){
 		setProperty(*it,newCurrentVideo->getProperty(*it));
 	}
-	Frame* frame= newCurrentVideo->frames.front();
-	scene->removeItem(frame->item);
-	    scene->addItem(frame->item);
-ui->graphicsView->show();
+	ui->horizontalSlider->setValue(floorf(newCurrentVideo->getPosition()*(float)ui->horizontalSlider->maximum()));
+	//Frame* frame= newCurrentVideo->frames.front();
+	//scene->removeItem(frame->getPixmap());
+	 //   scene->addItem(frame->getPixmap());
+//ui->graphicsView->show();
 }
 
 void MainWindow::initPython(){
