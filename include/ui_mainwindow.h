@@ -22,6 +22,7 @@
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QSlider>
 #include <QtWidgets/QStatusBar>
+#include <QtWidgets/QTableView>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 #include "listwidget.h"
@@ -34,10 +35,11 @@ class Ui_MainWindow
 public:
     QAction *actionOpen;
     QWidget *centralwidget;
-    QGridLayout *gridLayout_2;
     QGridLayout *gridLayout;
+    QVBoxLayout *verticalLayout_2;
     QHBoxLayout *horizontalLayout;
     ListWidget *listWidget;
+    QTableView *tableView;
     QVBoxLayout *verticalLayout;
     QGraphicsView *graphicsView;
     QSlider *horizontalSlider;
@@ -50,17 +52,17 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QStringLiteral("MainWindow"));
-        MainWindow->resize(904, 719);
+        MainWindow->resize(779, 660);
         MainWindow->setAcceptDrops(false);
         actionOpen = new QAction(MainWindow);
         actionOpen->setObjectName(QStringLiteral("actionOpen"));
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QStringLiteral("centralwidget"));
         centralwidget->setAcceptDrops(false);
-        gridLayout_2 = new QGridLayout(centralwidget);
-        gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
-        gridLayout = new QGridLayout();
+        gridLayout = new QGridLayout(centralwidget);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        verticalLayout_2 = new QVBoxLayout();
+        verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
         listWidget = new ListWidget(centralwidget);
@@ -70,6 +72,11 @@ public:
         listWidget->setAcceptDrops(true);
 
         horizontalLayout->addWidget(listWidget);
+
+        tableView = new QTableView(centralwidget);
+        tableView->setObjectName(QStringLiteral("tableView"));
+
+        horizontalLayout->addWidget(tableView);
 
         verticalLayout = new QVBoxLayout();
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
@@ -89,7 +96,7 @@ public:
         horizontalLayout->addLayout(verticalLayout);
 
 
-        gridLayout->addLayout(horizontalLayout, 0, 0, 1, 1);
+        verticalLayout_2->addLayout(horizontalLayout);
 
         widget = new pythonConsoleMain(centralwidget);
         widget->setObjectName(QStringLiteral("widget"));
@@ -100,15 +107,15 @@ public:
         widget->setSizePolicy(sizePolicy);
         widget->setMinimumSize(QSize(0, 250));
 
-        gridLayout->addWidget(widget, 1, 0, 1, 1);
+        verticalLayout_2->addWidget(widget);
 
 
-        gridLayout_2->addLayout(gridLayout, 0, 0, 1, 1);
+        gridLayout->addLayout(verticalLayout_2, 0, 0, 1, 1);
 
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName(QStringLiteral("menubar"));
-        menubar->setGeometry(QRect(0, 0, 904, 25));
+        menubar->setGeometry(QRect(0, 0, 779, 25));
         menubar->setAcceptDrops(false);
         menuFile = new QMenu(menubar);
         menuFile->setObjectName(QStringLiteral("menuFile"));

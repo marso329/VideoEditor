@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>904</width>
-    <height>719</height>
+    <width>779</width>
+    <height>660</height>
    </rect>
   </property>
   <property name="acceptDrops">
@@ -20,10 +20,10 @@
    <property name="acceptDrops">
     <bool>false</bool>
    </property>
-   <layout class="QGridLayout" name="gridLayout_2">
+   <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0">
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
          <widget class="ListWidget" name="listWidget">
@@ -45,6 +45,9 @@
          </widget>
         </item>
         <item>
+         <widget class="QTableView" name="tableView"/>
+        </item>
+        <item>
          <layout class="QVBoxLayout" name="verticalLayout">
           <item>
            <widget class="QGraphicsView" name="graphicsView">
@@ -64,7 +67,7 @@
         </item>
        </layout>
       </item>
-      <item row="1" column="0">
+      <item>
        <widget class="pythonConsoleMain" name="widget" native="true">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
@@ -89,7 +92,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>904</width>
+     <width>779</width>
      <height>25</height>
     </rect>
    </property>
